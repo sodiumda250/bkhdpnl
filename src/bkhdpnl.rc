@@ -1,4 +1,4 @@
-// $Id: bkhdpnl.rc,v 1.7 2005/05/27 09:56:22 woods Exp $
+// $Id: bkhdpnl.rc,v 1.8 2005/06/01 03:09:26 woods Exp $
 //Microsoft Developer Studio generated resource script.
 //
 #include "resource.h"
@@ -68,7 +68,7 @@ BEGIN
     PUSHBUTTON      "フォント選択",IDC_FONT,7,66,55,14
     PUSHBUTTON      "ヘッダ表示色選択",IDC_HEADERCOLOR,69,66,77,14
     PUSHBUTTON      "ヘッダ名表示色選択",IDC_NAMECOLOR,69,88,77,14
-    PUSHBUTTON      "背景名表示色選択",IDC_BODYCOLOR,69,110,77,14
+    PUSHBUTTON      "背景表示色選択",IDC_BODYCOLOR,69,110,77,14
     DEFPUSHBUTTON   "OK",IDOK,153,66,55,14
     PUSHBUTTON      "キャンセル",IDCANCEL,153,88,55,14
     PUSHBUTTON      "About",IDC_ABOUT,153,110,55,14

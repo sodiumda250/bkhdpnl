@@ -1,9 +1,9 @@
 #!/usr/bin/make -f
-# $Id: Makefile,v 1.14 2005/05/25 05:24:51 woods Exp $
+# $Id: Makefile,v 1.15 2005/06/01 13:01:40 woods Exp $
 
 MAJOR = 0
 MINOR = 1
-TEENY = 0
+TEENY = 1
 
 COPYRIGHT = '"Copyright (C) 2000-2005 woods"'
 
@@ -46,7 +46,7 @@ LDFLAGS = -pipe -Wl,--enable-stdcall-fixup -mno-cygwin -mwindows -mingw \
  -mdll -mshared \
  -L/usr/lib/w32api
 
-INSTALLPATH = /cygdrive/c/Becky!/`whoami`/Plugins
+INSTALLPATH = /cygdrive/e/usr/`whoami`/Becky!/Plugins
 INSTALLNAME = bkhdpnl.dll
 
 DOCDIR = doc
