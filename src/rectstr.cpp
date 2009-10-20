@@ -1,12 +1,14 @@
 /*
- * $Id: rectstr.cpp,v 1.5 2005/05/10 01:18:18 woods Exp $
+ * $Id: rectstr.cpp,v 1.7 2005/05/26 04:59:37 woods Exp $
  */
 
-static char id[] = "$Id: rectstr.cpp,v 1.5 2005/05/10 01:18:18 woods Exp $";
+static char id[] = "$Id: rectstr.cpp,v 1.7 2005/05/26 04:59:37 woods Exp $";
 
 #include <windows.h>
 #include "vec.h"
 #include "rectstr.h"
+
+COLORREF rectchar::c_color = 0x00000000;
 
 /**
  * @brief ダブルバイト文字を含む文字列の文字数を返却する。
@@ -113,7 +115,6 @@ rectstr& rectstr::operator=(const char* str)
 }
 /**
  * @brief 表示文字配列構造体の表示領域を計算して設定する
- * @param rs 表示文字配列構造体
  * @param hdc 表示用デバイスコンテキスト
  * @param pt 表示位置
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: vec.h,v 1.7 2005/05/12 06:16:20 woods Exp $
+ * $Id: vec.h,v 1.9 2005/05/26 04:59:37 woods Exp $
  */
 
 #ifndef VEC_H
@@ -10,8 +10,9 @@
 
 template <class T> class vec {
 protected:
-/// @brief 領域確保時の最小サイズ
-const static size_t MIN_SIZE = 32;
+    /// @brief 領域確保時の最小サイズ
+    const static size_t MIN_SIZE = 32;
+protected:
     /// @brief 現在確保している領域の大きさ
     size_t m_size;
     /// @brief 現在保持している領域の大きさ
@@ -25,6 +26,9 @@ protected:
     /**
      * @brief 領域を拡張する
      * @param s 拡張する大きさ
+     *
+     * 指定された大きさまで領域を拡張する。
+     * 既に指定された大きさ以上の領域を持つ場合は何もしない。
      */
     size_t wide(size_t s) {
         if (m_size >= s) {
@@ -196,9 +200,35 @@ public:
         return inner_del(dst, 0, false);
     };
 
+    /**
+     * @brief 文字列からのコピーコンストラクタ
+     * @param str コピー元文字列
+     *
+     * 文字列の長さ＋１の領域を確保し、文字列を格納する
+     * 最後の要素の１つ後にを'\0'を設定する。
+     */
     vec<T>(const char *str);
-    vec<T>& operator=(const char *);
-    vec<T>& operator+=(const char *);
+
+    /**
+     * @brief 文字列代入演算子
+     * @param str 代入する文字列
+     *
+     * パラメータで指定されたコピー元文字列の長さ＋１の領域を確保し、
+     * 値をコピーする。
+     */
+    vec<T>& operator=(const char *str);
+
+    /**
+     * @brief 文字列追加代入演算子
+     * @param str 追加する文字列
+     *
+     * パラメータで指定されたコピー元文字列を、現要素の後ろに追加する
+     */
+    vec<T>& operator+=(const char *str);
+
+    /**
+     * @brief Cスタイルの文字列を返却する
+     */
     char* c_str();
 };
 

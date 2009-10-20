@@ -1,9 +1,9 @@
 /*
- * $Id: dialog.cpp,v 1.2 2005/05/12 02:51:27 woods Exp $
+ * $Id: dialog.cpp,v 1.5 2005/05/26 04:09:08 woods Exp $
  * dialog.cpp : ダイアログ用のプロシージャ定義
  */
 
-static char id[] = "$Id: dialog.cpp,v 1.2 2005/05/12 02:51:27 woods Exp $";
+static char id[] = "$Id: dialog.cpp,v 1.5 2005/05/26 04:09:08 woods Exp $";
 
 #include <stdio.h>
 #include "resource.h"
@@ -30,6 +30,9 @@ static LRESULT CALLBACK Setting(HWND, UINT, WPARAM, LPARAM);
 }
 
 static BOOL SelectFont(void);
+static BOOL SelectHeaderColor(void);
+static BOOL SelectNameColor(void);
+static BOOL SelectBodyColor(void);
 
 /**
  * @brief 設定ダイアログ表示関数
@@ -109,6 +112,15 @@ Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         case IDC_FONT:
             SelectFont();
             break;
+        case IDC_HEADERCOLOR:
+            SelectHeaderColor();
+            break;
+        case IDC_NAMECOLOR:
+            SelectNameColor();
+            break;
+        case IDC_BODYCOLOR:
+            SelectBodyColor();
+            break;
         }
         break;
     default:
@@ -146,6 +158,8 @@ About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 /**
  * @brief フォント選択ダイアログ表示
+ * @retval true フォントが選択された
+ * @retval false フォントが選択されていない
  *
  * iniファイルからフォント情報を取得して、
  * それを初期値としてフォント選択コモンダイアログを表示し、
@@ -168,6 +182,99 @@ static BOOL SelectFont(void)
     ret = ::ChooseFont(&font);
     if (ret) {
         SaveFont(&logfont, szIni);
+    }
+    return ret;
+}
+
+/**
+ * @brief ヘッダ表示色選択ダイアログ表示
+ * @retval true 表示色が選択された
+ * @retval false 表示色が選択されていない
+ *
+ * iniファイルからヘッダ表示色情報を取得して、
+ * それを初期値として表示色選択コモンダイアログを表示し、
+ * コモンダイアログで設定された情報をiniファイルに設定する。
+ */
+static BOOL SelectHeaderColor(void)
+{
+    BOOL ret;
+    CHOOSECOLOR  color;
+    COLORREF cust[16];
+
+    memset(&color, 0, sizeof(color));
+    for (size_t i = 0; i < sizeof(cust) / sizeof(cust[0]); i++) {
+        cust[i] = 0x00ffffff;
+    }
+
+    color.lStructSize = sizeof(color);
+    color.rgbResult = LoadHeaderColor(szIni);
+    color.lpCustColors = (COLORREF*)cust;
+    color.Flags = CC_FULLOPEN | CC_RGBINIT;
+    ret = ::ChooseColor(&color);
+    if (ret) {
+        SaveHeaderColor(color.rgbResult, szIni);
+    }
+    return ret;
+}
+
+/**
+ * @brief ヘッダ名表示色選択ダイアログ表示
+ * @retval true 表示色が選択された
+ * @retval false 表示色が選択されていない
+ *
+ * iniファイルからヘッダ名表示色情報を取得して、
+ * それを初期値として表示色選択コモンダイアログを表示し、
+ * コモンダイアログで設定された情報をiniファイルに設定する。
+ */
+static BOOL SelectNameColor(void)
+{
+    BOOL ret;
+    CHOOSECOLOR  color;
+    COLORREF cust[16];
+
+    memset(&color, 0, sizeof(color));
+    for (size_t i = 0; i < sizeof(cust) / sizeof(cust[0]); i++) {
+        cust[i] = 0x00ffffff;
+    }
+
+    color.lStructSize = sizeof(color);
+    color.rgbResult = LoadNameColor(szIni);
+    color.lpCustColors = (COLORREF*)cust;
+    color.Flags = CC_FULLOPEN | CC_RGBINIT;
+    ret = ::ChooseColor(&color);
+    if (ret) {
+        SaveNameColor(color.rgbResult, szIni);
+    }
+    return ret;
+}
+
+/**
+ * @brief 背景色選択ダイアログ表示
+ * @retval true 背景色が選択された
+ * @retval false 背景色が選択されていない
+ *
+ * iniファイルから背景色情報を取得して、
+ * それを初期値として表示色選択コモンダイアログを表示し、
+ * コモンダイアログで設定された情報をiniファイルに設定する。
+ */
+static BOOL SelectBodyColor(void)
+{
+    BOOL ret;
+    CHOOSECOLOR  color;
+    COLORREF cust[16];
+
+    memset(&color, 0, sizeof(color));
+    for (size_t i = 0; i < sizeof(cust) / sizeof(cust[0]); i++) {
+        cust[i] = 0x00ffffff;
+    }
+
+    color.lStructSize = sizeof(color);
+    color.rgbResult = LoadBodyColor(szIni);
+    color.lpCustColors = (COLORREF*)cust;
+    color.Flags = CC_FULLOPEN | CC_RGBINIT;
+    ret = ::ChooseColor(&color);
+    if (ret) {
+        SaveBodyColor(color.rgbResult, szIni);
     }
     return ret;
 }

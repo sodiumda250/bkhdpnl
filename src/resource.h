@@ -1,4 +1,4 @@
-// $Id: resource.h,v 1.1.1.1 2005/05/09 01:54:00 woods Exp $
+// $Id: resource.h,v 1.2 2005/05/24 03:45:26 woods Exp $
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
 //
@@ -18,8 +18,11 @@
 #define IDC_HEADERS                     1000
 #define IDC_HEADERSCAPTION              1001
 #define IDC_FONT                        1002
-#define IDC_ABOUT                       1003
-#define IDC_ADJUSTWINDOW                1004
+#define IDC_HEADERCOLOR                 1003
+#define IDC_NAMECOLOR                   1004
+#define IDC_BODYCOLOR                   1005
+#define IDC_ABOUT                       1006
+#define IDC_ADJUSTWINDOW                1007
 #define IDC_STATIC                      -1
 
 #define IDM_CUT                         57635
@@ -31,7 +34,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1005
+#define _APS_NEXT_CONTROL_VALUE         1008
 #define _APS_NEXT_SYMED_VALUE           113
 #endif
 #endif

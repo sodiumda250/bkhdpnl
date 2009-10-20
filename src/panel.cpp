@@ -1,8 +1,8 @@
 /*
- * $Id: panel.cpp,v 1.1 2005/05/12 06:19:55 woods Exp $
+ * $Id: panel.cpp,v 1.9 2005/05/26 09:10:25 woods Exp $
  */
 
-static char id[] = "$Id: panel.cpp,v 1.1 2005/05/12 06:19:55 woods Exp $";
+static char id[] = "$Id: panel.cpp,v 1.9 2005/05/26 09:10:25 woods Exp $";
 
 #include <windows.h>
 #include <commctrl.h>
@@ -18,10 +18,9 @@ static char id[] = "$Id: panel.cpp,v 1.1 2005/05/12 06:19:55 woods Exp $";
 
 PanelWindow *Panel = NULL;
 
-static void Redraw(void);
-
 /**
  * @brief ヘッダ表示ウィンドウ情報の初期化
+ * @param hInstance このクラスが属するモジュールのインスタンス
  * @param szIniFile iniファイルのパス名
  * @retval TRUE 初期化成功
  * @retval FALSE 初期化失敗
@@ -34,17 +33,19 @@ BOOL InitHeader(HINSTANCE hInstance, const char *szIniFile)
     int len;
     int i, j;
 
+    LoadAdjust(szIniFile);
+    LoadHeaderColor(szIniFile);
+    LoadNameColor(szIniFile);
+    LoadBodyColor(szIniFile);
+
     PanelWindow::initClass(hInstance);
+
     Panel = new PanelWindow();
 
-    LoadAdjust(szIniFile);
-
-    Panel->rect().top =
-             GetPrivateProfileInt("BkHdPnl", "Top", 0, szIni);
-    Panel->rect().left =
-             GetPrivateProfileInt("BkHdPnl", "Left", 0, szIni);
-    int cy = GetPrivateProfileInt("BkHdPnl", "Height", 45, szIni);
-    int cx = GetPrivateProfileInt("BkHdPnl", "Width", 200, szIni);
+    Panel->rect().top =  ::GetPrivateProfileInt("BkHdPnl", "Top", 0, szIni);
+    Panel->rect().left = ::GetPrivateProfileInt("BkHdPnl", "Left", 0, szIni);
+    int cy = ::GetPrivateProfileInt("BkHdPnl", "Height", 45, szIni);
+    int cx = ::GetPrivateProfileInt("BkHdPnl", "Width", 200, szIni);
     Panel->rect().bottom = Panel->rect().top + cy;
     Panel->rect().right = Panel->rect().left + cx;
 
@@ -73,8 +74,8 @@ BOOL InitHeader(HINSTANCE hInstance, const char *szIniFile)
 
 /**
  * @brief ヘッダ表示ウィンドウ情報のデストラクタ
- * @retval TRUE 破壊成功
- * @retval FALSE 破壊失敗
+ * @retval true 破壊成功
+ * @retval false 破壊失敗
  *
  * ヘッダ表示ウィンドウ情報を破棄する。
  */
@@ -87,23 +88,21 @@ BOOL DestroyHeader(void)
 
     PanelWindow::deleteFont();
 
-    return TRUE;
+    return true;
 }
 
 /**
  * @brief ヘッダ情報の表示
  * @param lpMailID : メールID
- * @return 表示ウィンドウの個数
  *
  * 指定されたメールのヘッダ情報からヘッダ表示ウィンドウを表示する。
  */
-int ShowHeader(LPCTSTR lpMailID)
+void ShowHeader(LPCTSTR lpMailID)
 {
     if (Panel != NULL) {
         Panel->ShowHeader(lpMailID);
         Panel->ShowWindow();
     }
-    return 0;
 }
 
 /**
@@ -114,7 +113,19 @@ int ShowHeader(LPCTSTR lpMailID)
 void ShowWindow(void)
 {
     if (Panel != NULL) {
-        Panel->ShowWindow();
+        WINDOWPLACEMENT wplace;
+        HWND hMain, hTree, hList, hView;
+
+        bka.GetWindowHandles(&hMain, &hTree, &hList, &hView);
+
+        wplace.length = sizeof(WINDOWPLACEMENT);
+        wplace.showCmd = SW_SHOWNORMAL;
+        ::GetWindowPlacement(hMain, &wplace);
+        if (wplace.showCmd == SW_SHOWMAXIMIZED) {
+            Panel->HideWindow();
+        } else {
+            Panel->ShowWindow();
+        }
     }
 }
 
@@ -197,8 +208,7 @@ BOOL LoadFont(LOGFONT *lf, const char *szIni)
 
     memset(lf, 0, sizeof(LOGFONT));
 
-    lf->lfHeight =
-        ::GetPrivateProfileInt("BkHdPnl", "FontSize", -12, szIni);
+    lf->lfHeight = ::GetPrivateProfileInt("BkHdPnl", "FontSize", -12, szIni);
     lf->lfCharSet = DEFAULT_CHARSET;
     lf->lfClipPrecision = CLIP_DEFAULT_PRECIS;
     lf->lfOutPrecision = OUT_DEFAULT_PRECIS;
@@ -225,11 +235,11 @@ BOOL SaveFont(LOGFONT *lf, const char *szIni)
 {
     char buffer[128];
 
-    ::WritePrivateProfileString("BkHdPnl", "FontName",
-                                lf->lfFaceName, szIni);
+    ::WritePrivateProfileString("BkHdPnl", "FontName", lf->lfFaceName, szIni);
+
     sprintf(buffer, "%ld", lf->lfHeight);
-    ::WritePrivateProfileString("BkHdPnl", "FontSize",
-                                buffer, szIni);
+    ::WritePrivateProfileString("BkHdPnl", "FontSize", buffer, szIni);
+
     sprintf(buffer, "%ld", lf->lfWeight);
     ::WritePrivateProfileString("BkHdPnl", "FontWeight", buffer, szIni);
 
@@ -246,7 +256,7 @@ BOOL SaveFont(LOGFONT *lf, const char *szIni)
  *
  * ヘッダ表示ウィンドウを全て再描画する。
  */
-static void Redraw(void)
+void Redraw(void)
 {
     Panel->redraw();
 }
@@ -262,17 +272,13 @@ void SaveWindowPos(const char *szIni)
     char buf[128];
 
     sprintf(buf, "%ld", Panel->rect().top);
-    ::WritePrivateProfileString("BkHdPnl", "Top",
-                                buf, szIni);
+    ::WritePrivateProfileString("BkHdPnl", "Top", buf, szIni);
     sprintf(buf, "%ld", Panel->rect().left);
-    ::WritePrivateProfileString("BkHdPnl", "Left",
-                                buf, szIni);
+    ::WritePrivateProfileString("BkHdPnl", "Left", buf, szIni);
     sprintf(buf, "%ld", Panel->rect().bottom - Panel->rect().top);
-    ::WritePrivateProfileString("BkHdPnl", "Height",
-                                buf, szIni);
+    ::WritePrivateProfileString("BkHdPnl", "Height", buf, szIni);
     sprintf(buf, "%ld", Panel->rect().right - Panel->rect().left);
-    ::WritePrivateProfileString("BkHdPnl", "Width",
-                                buf, szIni);
+    ::WritePrivateProfileString("BkHdPnl", "Width", buf, szIni);
 }
 
 /**
@@ -306,6 +312,99 @@ void SaveAdjust(UINT pAdjust, const char *szIni)
 }
 
 /**
+ * @brief ヘッダ表示色をロードする
+ * @param szIni iniファイルのパス名
+ * @return ロードした表示色
+ */
+COLORREF LoadHeaderColor(const char *szIni)
+{
+    int len;
+    char buf[128];
+    COLORREF col;
+
+    len = ::GetPrivateProfileString("BkHdPnl", "HeaderColor", "0x00000000",
+                          buf, sizeof(buf) - 1, szIni);
+    col = (COLORREF)strtoul(buf, NULL, 0);
+    PanelWindow::setheadercolor(col);
+    return col;
+}
+
+/**
+ * @brief ヘッダ表示色をセーブする
+ * @param col セーブする表示色
+ * @param szIni iniファイルのパス名
+ */
+void SaveHeaderColor(COLORREF col, const char *szIni)
+{
+    char buf[128];
+    sprintf(buf, "0x%08lx", col);
+    ::WritePrivateProfileString("BkHdPnl", "HeaderColor", buf, szIni);
+    PanelWindow::setheadercolor(col);
+}
+
+/**
+ * @brief ヘッダ名表示色をロードする
+ * @param szIni iniファイルのパス名
+ * @return ロードした表示色
+ */
+COLORREF LoadNameColor(const char *szIni)
+{
+    int len;
+    char buf[128];
+    COLORREF col;
+
+    len = ::GetPrivateProfileString("BkHdPnl", "NameColor", "0x00000000",
+                          buf, sizeof(buf) - 1, szIni);
+    col = (COLORREF)strtoul(buf, NULL, 0);
+    PanelWindow::setnamecolor(col);
+    return col;
+}
+
+/**
+ * @brief ヘッダ名表示色をセーブする
+ * @param col セーブする表示色
+ * @param szIni iniファイルのパス名
+ */
+void SaveNameColor(COLORREF col, const char *szIni)
+{
+    char buf[128];
+    sprintf(buf, "0x%08lx", col);
+    ::WritePrivateProfileString("BkHdPnl", "NameColor", buf, szIni);
+    PanelWindow::setnamecolor(col);
+}
+
+/**
+ * @brief 背景色をロードする
+ * @param szIni iniファイルのパス名
+ * @return ロードした背景色
+ */
+COLORREF LoadBodyColor(const char *szIni)
+{
+    int len;
+    char buf[128];
+    COLORREF col;
+
+    len = ::GetPrivateProfileString("BkHdPnl", "BodyColor", "0x00ffffff",
+                          buf, sizeof(buf) - 1, szIni);
+    col = (COLORREF)strtoul(buf, NULL, 0);
+    PanelWindow::setbodycolor(col);
+    return col;
+}
+
+/**
+ * @brief 背景色をセーブする
+ * @param col セーブする背景色
+ * @param szIni iniファイルのパス名
+ */
+void SaveBodyColor(COLORREF col, const char *szIni)
+{
+    char buf[128];
+    sprintf(buf, "0x%08lx", col);
+    ::WritePrivateProfileString("BkHdPnl", "BodyColor", buf, szIni);
+    PanelWindow::setbodycolor(col);
+}
+
+/**
  * @brief RECTの範囲の合成
  * @param dst 合成対象のRECT構造体ポインタ
  * @param src 合成するRECT構造体ポインタ
@@ -327,6 +426,7 @@ RECT& addrect(RECT& dst, const RECT& src)
  * @brief 文字列から1行分だけ切り出す。
  * @param buf 切り出した1行分の文字列
  * @param pt 切り出し対象の文字列ポインタへのポインタ
+ * 切り出した後の文字列を返却する。
  * @return 切り出した1行分の文字列
  */
 vec<char>& getLine(vec<char>& buf, char **pt)

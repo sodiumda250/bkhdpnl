@@ -1,4 +1,4 @@
-/* $Id: panelwin.h,v 1.6 2005/05/12 04:33:12 woods Exp $ */
+/* $Id: panelwin.h,v 1.9 2005/05/26 09:10:25 woods Exp $ */
 
 #ifndef PANELWIN_H
 #define PANELWIN_H
@@ -12,6 +12,9 @@ class PanelWindow {
 // class member
     /// モジュールインスタンス
     static HINSTANCE c_instance;
+
+    /// ウィンドウクラスのATOM
+    static ATOM c_atom;
 
     /// ウィンドウの大きさの横の最小値(枠の大きさなど)
     static int c_addx;
@@ -29,6 +32,13 @@ class PanelWindow {
 
     /// ウィンドウ管理用
     static vec<PanelWindow*> window;
+
+    /// ヘッダ表示色
+    static COLORREF c_headercolor;
+    /// ヘッダ名表示色
+    static COLORREF c_namecolor;
+    /// 背景色
+    static COLORREF c_bodycolor;
 
 // instance member
     /// ウィンドウハンドル
@@ -128,6 +138,39 @@ public:
     }
     /// @brief 設定されたフォントハンドルを返却する
     static const HFONT font(void) { return c_hFont;};
+
+    /// @brief 設定されたヘッダ表示色を返却する。
+    static COLORREF& headercolor(void) { return c_headercolor;};
+
+    /// @brief ヘッダ表示色を設定する。
+    static void setheadercolor(COLORREF& col) { c_headercolor = col; rectchar::setDefaultColor(col);};
+
+    /// @brief 設定されたヘッダ名表示色を返却する。
+    static COLORREF& namecolor(void) { return c_namecolor;};
+
+    /// @brief ヘッダ名表示色を設定する。
+    static void setnamecolor(COLORREF& col) { c_namecolor = col;};
+
+    /// @brief 設定された背景色を返却する。
+    static COLORREF& bodycolor(void) { return c_bodycolor;};
+
+    /// @brief 背景色を設定する。
+    static void setbodycolor(COLORREF& col) {
+        c_bodycolor = col;
+        if (c_atom != 0) {
+            LOGBRUSH lb;
+
+            lb.lbStyle = BS_SOLID;
+            lb.lbColor = col;
+            lb.lbHatch = HS_CROSS;
+
+            HBRUSH hbrush = ::CreateBrushIndirect(&lb);
+            HBRUSH oldbrush = (HBRUSH)::SetClassLong(window[0]->hwnd(), GCL_HBRBACKGROUND, (long)hbrush);
+            if (oldbrush != NULL) {
+                ::DeleteObject(oldbrush);
+            }
+        }
+    };
 
     /// @brief ウィンドウサイズ自動調整有無を返却する
     static UINT adjust(){return c_adjust;};

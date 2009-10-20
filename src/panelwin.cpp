@@ -1,8 +1,8 @@
 /*
- * $Id: panelwin.cpp,v 1.15 2005/05/12 04:33:12 woods Exp $
+ * $Id: panelwin.cpp,v 1.21 2005/05/26 04:59:37 woods Exp $
  */
 
-static char id[] = "$Id: panelwin.cpp,v 1.15 2005/05/12 04:33:12 woods Exp $";
+static char id[] = "$Id: panelwin.cpp,v 1.21 2005/05/26 04:59:37 woods Exp $";
 
 #include <windows.h>
 #include <commctrl.h>
@@ -16,17 +16,19 @@ static char id[] = "$Id: panelwin.cpp,v 1.15 2005/05/12 04:33:12 woods Exp $";
 
 // PanelWindowクラスのstaticメンバ初期化
 HINSTANCE PanelWindow::c_instance = 0;
+ATOM PanelWindow::c_atom = 0;
 int PanelWindow::c_addx = 0;
 int PanelWindow::c_addy = 0;
 HFONT PanelWindow::c_hFont = 0;
 UINT PanelWindow::c_adjust = 0;
 TCHAR PanelWindow::szWindowClass[100] = "";
 vec<PanelWindow*> PanelWindow::window;
+COLORREF PanelWindow::c_headercolor = 0x00000000;
+COLORREF PanelWindow::c_namecolor = 0x00004080;
+COLORREF PanelWindow::c_bodycolor = 0x00ffffff;
 
 // このコード モジュールに含まれる関数の前宣言:
-extern "C" {
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-}
 
 /**
  * @brief ヘッダ情報の表示
@@ -65,6 +67,32 @@ void PanelWindow::ShowHeader(LPCTSTR lpMailID)
         }
     }
 
+    // ヘッダ名の部分に表示色を設定します。
+    {
+        bool isName = true;
+
+        for (rectstr::iterator i = body().begin();
+             i < body().end();
+             i++)
+        {
+            if (strcmp(body()[i].c_str(), ":") == 0) {
+                body()[i].setcolor(namecolor());
+                isName = false;
+            } else if (body()[i].eol()) {
+                body()[i].setcolor(headercolor());
+                if ((i < body().end()) && (body()[i + 1].isspace())) {
+                    isName = false;
+                } else {
+                    isName = true;
+                }
+            } else if (isName) {
+                body()[i].setcolor(namecolor());
+            } else {
+                body()[i].setcolor(headercolor());
+            }
+        }
+    }
+
     // 文字列の幅と高さを計算します。
     HDC hdc = GetDC(hwnd());
     ::SelectObject(hdc, font());
@@ -89,14 +117,20 @@ void PanelWindow::ShowHeader(LPCTSTR lpMailID)
  */
 ATOM PanelWindow::MyRegisterClass(HINSTANCE hInstance)
 {
-    ATOM ret;
     WNDCLASSEX wcex;
-
+    LOGBRUSH lb;
+    HBRUSH hbrush;
 
     if (strcmp(PanelWindow::WindowClass(), "BKHDPNL") == 0) {
         return 1;
     }
     PanelWindow::setWindowClass("BKHDPNL");
+
+    lb.lbStyle = BS_SOLID;
+    lb.lbColor = bodycolor();
+    lb.lbHatch = HS_CROSS;
+
+    hbrush = CreateBrushIndirect(&lb);
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
@@ -106,14 +140,15 @@ ATOM PanelWindow::MyRegisterClass(HINSTANCE hInstance)
     wcex.cbWndExtra = 0;
     wcex.hInstance = hInstance;
     wcex.hCursor = LoadCursor(NULL, IDC_IBEAM);
-    wcex.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
+    wcex.hbrBackground = hbrush;
+    //wcex.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
     wcex.lpszMenuName = NULL;
     wcex.lpszClassName = PanelWindow::WindowClass();
     wcex.hIcon = LoadIcon(NULL, (LPCTSTR)IDI_APPLICATION);
     wcex.hIconSm = NULL;//LoadIcon(wcex.hInstance, (LPCTSTR) IDI_SMALL);
 
-    ret = RegisterClassEx(&wcex);
-    if (ret == 0) {
+    c_atom = RegisterClassEx(&wcex);
+    if (c_atom == 0) {
         LPVOID lpMsgBuf;
 
         FormatMessage( 
@@ -130,7 +165,7 @@ ATOM PanelWindow::MyRegisterClass(HINSTANCE hInstance)
         MessageBox( NULL, (char *)lpMsgBuf, "Error", MB_OK | MB_ICONINFORMATION );
         LocalFree( lpMsgBuf );
     }
-    return ret;
+    return c_atom;
 }
 
 /**
@@ -290,21 +325,17 @@ LRESULT PanelWindow::OnPaint(WPARAM wParam, LPARAM lParam)
     HDC hdc;
     RECT urect;
 
-    COLORREF ctextn, cbackn;
-
     hdc = ::BeginPaint(hwnd(), &ps);
-    ctextn = ::GetTextColor(hdc);
-    cbackn = ::GetBkColor(hdc);
     urect = ps.rcPaint;
     ::SelectObject(hdc, PanelWindow::font());
     for (j = 0; j < body().length(); j++) {
         if (body(j).in_rect(urect)) {
             if (body(j).reverse() != 0) {
-                ::SetTextColor(hdc, cbackn);
-                ::SetBkColor(hdc, ctextn);
+                ::SetTextColor(hdc, bodycolor());
+                ::SetBkColor(hdc, body(j).color());
             } else {
-                ::SetTextColor(hdc, ctextn);
-                ::SetBkColor(hdc, cbackn);
+                ::SetTextColor(hdc, body(j).color());
+                ::SetBkColor(hdc, bodycolor());
             }
             if (body(j).str()[0] == '\t') {
                 char* buf = new char[rectstr::tabsize() + 1];
@@ -328,8 +359,6 @@ LRESULT PanelWindow::OnPaint(WPARAM wParam, LPARAM lParam)
 
 /**
  * @brief WM_LBUTTONDOWNイベント処理
- * @param hWnd : ウィンドウハンドル
- * @param message : メッセージ(WM_LBUTTONDOWN)
  * @param wParam : メッセージのパラメータ
  * @param lParam : メッセージのパラメータ(mouse clicked point)
  *
@@ -491,7 +520,6 @@ LRESULT PanelWindow::OnDestroy(WPARAM wParam, LPARAM lParam)
 
 /**
  * @brief クリップボードへコピー
- * @param hwnd コピー対象のウィンドウのハンドル
  *
  * ヘッダ表示ウィンドウのテキストをクリップボードにコピーする。
  */

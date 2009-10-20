@@ -1,4 +1,4 @@
-// $Id: bkhdpnl.rc,v 1.2 2005/05/09 05:21:14 woods Exp $
+// $Id: bkhdpnl.rc,v 1.7 2005/05/27 09:56:22 woods Exp $
 //Microsoft Developer Studio generated resource script.
 //
 #include "resource.h"
@@ -45,7 +45,7 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 IDD_ABOUTBOX DIALOG DISCARDABLE  22, 17, 230, 41
 STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
 CAPTION "Version Information"
-FONT 8, "System"
+FONT 9, "System"
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 BEGIN
     LTEXT           VERSION_STR, IDC_STATIC,49,10,119,8,SS_NOPREFIX
@@ -53,10 +53,10 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,195,6,30,11,WS_GROUP
 END
 
-IDD_SETTING DIALOG DISCARDABLE  0, 0, 215, 107
+IDD_SETTING DIALOG DISCARDABLE  0, 0, 215, 130
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "ヘッダ表示設定"
-FONT 8, "System"
+FONT 9, "System"
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 BEGIN
     LTEXT           "表示ヘッダ名をカンマ区切りで指定してください",
@@ -66,24 +66,33 @@ BEGIN
                         IDC_ADJUSTWINDOW, "Button",
                         BS_AUTOCHECKBOX | WS_TABSTOP,7,44,200,13
     PUSHBUTTON      "フォント選択",IDC_FONT,7,66,55,14
-    PUSHBUTTON      "About",IDC_ABOUT,7,88,55,14
+    PUSHBUTTON      "ヘッダ表示色選択",IDC_HEADERCOLOR,69,66,77,14
+    PUSHBUTTON      "ヘッダ名表示色選択",IDC_NAMECOLOR,69,88,77,14
+    PUSHBUTTON      "背景名表示色選択",IDC_BODYCOLOR,69,110,77,14
     DEFPUSHBUTTON   "OK",IDOK,153,66,55,14
     PUSHBUTTON      "キャンセル",IDCANCEL,153,88,55,14
+    PUSHBUTTON      "About",IDC_ABOUT,153,110,55,14
 END
 
-IDD_SETTING DIALOG DISCARDABLE  0, 0, 215, 87
+IDD_SETTING DIALOG DISCARDABLE  0, 0, 215, 130
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Setting Dialog"
-FONT 8, "System"
+FONT 9, "System"
 LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
 BEGIN
     LTEXT           "Set Header name with comma separeted(without blank)",
-                    IDC_HEADERSCAPTION,7,7,190,12
-    EDITTEXT        IDC_HEADERS,7,22,201,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "Select Font",IDC_FONT,7,44,49,14
-    PUSHBUTTON      "About",IDC_ABOUT,7,66,49,14
-    DEFPUSHBUTTON   "OK",IDOK,158,44,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,158,66,50,14
+                    IDC_HEADERSCAPTION,7,7,200,12
+    EDITTEXT        IDC_HEADERS,7,22,200,13,ES_AUTOHSCROLL
+    CONTROL         "adjust window size automatically",
+                        IDC_ADJUSTWINDOW, "Button",
+                        BS_AUTOCHECKBOX | WS_TABSTOP,7,44,200,13
+    PUSHBUTTON      "Select Font",IDC_FONT,7,66,55,14
+    PUSHBUTTON      "Header String Color",IDC_HEADERCOLOR,69,66,77,14
+    PUSHBUTTON      "Header Name String Color",IDC_NAMECOLOR,69,88,77,14
+    PUSHBUTTON      "Background Color",IDC_BODYCOLOR,69,110,77,14
+    DEFPUSHBUTTON   "OK",IDOK,153,66,55,14
+    PUSHBUTTON      "Cancel",IDCANCEL,153,88,55,14
+    PUSHBUTTON      "About",IDC_ABOUT,153,110,55,14
 END
 
 #ifdef APSTUDIO_INVOKED
@@ -153,6 +162,17 @@ BEGIN
     IDS_VENDOR      "woods"
     IDS_VERSION     VERSION_STR
     IDS_DESCRIPTION "ヘッダの内容を別ウィンドウで表示します"
+END
+
+STRINGTABLE DISCARDABLE 
+LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
+BEGIN
+    IDS_HDPNL	    "BkHdPnl"
+    IDS_COPYDONE    "copy to clipboard"
+    IDS_PLUGINNAME  "Header List display plug-in"
+    IDS_VENDOR      "woods"
+    IDS_VERSION     VERSION_STR
+    IDS_DESCRIPTION "Show Headers with other window"
 END
 
 /////////////////////////////////////////////////////////////////////////////

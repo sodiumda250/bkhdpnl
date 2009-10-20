@@ -1,8 +1,8 @@
 /*
- * $Id: hookproc.cpp,v 1.2 2005/05/12 02:51:27 woods Exp $
+ * $Id: hookproc.cpp,v 1.4 2005/05/25 03:55:53 woods Exp $
  */
 
-static char id[] = "$Id: hookproc.cpp,v 1.2 2005/05/12 02:51:27 woods Exp $";
+static char id[] = "$Id: hookproc.cpp,v 1.4 2005/05/25 03:55:53 woods Exp $";
 
 #include <stdio.h>
 #include <windows.h>
@@ -13,9 +13,9 @@ extern "C" {
 static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 }
 
-/// 元のウィンドウプロシージャ
+/// @brief 元のウィンドウプロシージャ
 static LONG prevWndProc = 0;
-/// サブクラス化したウィンドウのウィンドウハンドル
+/// @brief サブクラス化したウィンドウのウィンドウハンドル
 static HWND hookhwnd = 0;
 
 /**
@@ -30,20 +30,6 @@ void hookMailWindow(HWND hMainWnd)
     if (prevWndProc != 0) {
         hookhwnd = hMainWnd;
     } else {
-        hookhwnd = 0;
-    }
-}
-
-/**
- * @brief サブクラス化解除
- *
- * hookMailWindow()のサブクラス化を解除する。
- */
-void unhookMailWindow(void)
-{
-    if (prevWndProc != 0) {
-        ::SetWindowLong(hookhwnd, GWL_WNDPROC, (LONG)prevWndProc);
-        prevWndProc = 0;
         hookhwnd = 0;
     }
 }
@@ -77,6 +63,13 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
             default:
                break;
             }
+        }
+        break;
+    case WM_SIZE:
+        if (wParam == SIZE_MAXIMIZED) {
+            HideWindow();
+        } else if (wParam == SIZE_RESTORED) {
+            ShowWindow();
         }
         break;
     default:
