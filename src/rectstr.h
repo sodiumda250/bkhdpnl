@@ -1,5 +1,5 @@
 /*
- * $Id: rectstr.h,v 1.3 2005/05/10 01:18:18 woods Exp $
+ * $Id: rectstr.h,v 1.4 2005/05/11 02:57:09 woods Exp $
  */
 
 #ifndef RECTCHAR_H
@@ -30,9 +30,11 @@ public:
     /// @brief 反転表示有無を返却する
     const int reverse(void){ return m_reverse;};
 
+    /// @brief インスタンスを初期化する
     void init(void) {
         memset(this, 0, sizeof(*this));
     };
+    /// @brief インスタンスを初期化する
     void free(void) {
         memset(this, 0, sizeof(*this));
     };
@@ -51,7 +53,8 @@ public:
         m_str[m_len] = 0;
     };
 
-    /**     * @brief 反転表示有無を設定する
+    /**
+     * @brief 反転表示有無を設定する
      * @param rev 反転表示有無
      */
     int setreverse(const int rev) {
@@ -75,10 +78,14 @@ public:
 };
 
 class rectstr : public vec<rectchar> {
+    /// @brief タブサイズ
     const static int TAB_SIZE = 4;
+    /// @brief 文字列表示領域
     RECT m_rect;
 public:
+    /// @brief タブサイズを返却する
     static inline int tabsize(void){return TAB_SIZE;};
+    /// @brief 文字列表示領域を返却する
     const RECT& rect(void) {return m_rect;};
     rectstr& operator=(const char* str);
     void setrect(HDC hdc, const POINT& pt);

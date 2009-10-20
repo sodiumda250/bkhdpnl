@@ -1,4 +1,4 @@
-/* $Id: panelwin.h,v 1.3 2005/05/09 10:22:18 woods Exp $ */
+/* $Id: panelwin.h,v 1.6 2005/05/12 04:33:12 woods Exp $ */
 
 #ifndef PANELWIN_H
 #define PANELWIN_H
@@ -51,14 +51,32 @@ class PanelWindow {
     vec< vec<char> > m_header;
 public:
 // class method
+    /**
+     * @brief クラス情報の初期化
+     *
+     * モジュールインスタンス情報をクラス変数に設定する。
+     */
     static void initClass(HINSTANCE hInstance) {
         c_instance = hInstance;
+        MyRegisterClass(hInstance);
     };
+    static ATOM MyRegisterClass(HINSTANCE hInstance);
+    /**
+     * @brief ヘッダ表示ウィンドウクラスの登録
+     * @param hInstance : Window Procedureのあるモジュールのインスタンス
+     * @return ウィンドウクラスを識別するアトム
+     *
+     * ヘッダ表示ウィンドウのウィンドウクラスを登録する。
+     */
     /** @brief ウィンドウの大きさの横の最小値(枠の大きさなど) */
     static const int addx(){return c_addx;};
     /** @brief ウィンドウの大きさの縦の最小値(タイトルバー、枠の大きさなど) */
     static const int addy(){return c_addy;};
 
+    /**
+     * @brief ウィンドウハンドルからウィンドウインスタンスを求める
+     * @param hwnd ウィンドウハンドル
+     */
     static PanelWindow& getWindow(const HWND hwnd) {
         for (vec<PanelWindow>::iterator i = window.begin(); i < window.end(); i++) {
             if (window[i]->hwnd() == hwnd) {
@@ -68,7 +86,12 @@ public:
         return *(window[0]);
     };
 
+    /** @brief ウィンドウクラス名を取得する */
     static const char* WindowClass() { return szWindowClass;};
+    /**
+     * @brief ウィンドウクラス名を設定する
+     * @param name ウィンドウクラス名
+     */
     static void setWindowClass(char *name) {
         strncpy(szWindowClass, name, sizeof(szWindowClass));
     };
@@ -149,7 +172,9 @@ public:
     /// @brief ウィンドウの表示文字列インスタンスを返却する
     rectstr& body(void){return m_body;};
 
+    /// @brief 表示ヘッダのリストを返却する
     vec< vec<char> >& header() {return m_header;};
+    /// @brief 表示ヘッダのリストのn番目のヘッダを返却する
     vec<char>& header(int index) {return m_header[index];};
 
     /**
@@ -166,12 +191,15 @@ public:
         m_clickpoint.x = p.x;
         m_clickpoint.y = p.y;
     };
+    /// @brief マウスが移動したポイントを返却する
     const POINT& mousepoint(void){return m_mousepoint;};
     /// @brief クリック中かどうかを返却する
     int clicked(void){return m_clicked;};
     /// @brief クリック中かどうかを設定する
     void setclicked(const int f){m_clicked = f;};
+    /// @brief ウィンドウを表示するかどうかの情報を返却する
     int show(void){return m_show;};
+    /// @brief ウィンドウを表示するかどうかの情報を設定する
     void setshow(const int f){m_show = f;};
     /// @brief 初期化を行う
     void init(void) {
@@ -191,11 +219,21 @@ public:
             m_hwnd = NULL;
         }
     }
+    /**
+     * @brief コンストラクタ
+     *
+     * クラス変数にインスタンスを登録する
+     */
     PanelWindow(void) {
         PanelWindow* p = this;
         window.add(p);
         init();
     };
+    /**
+     * @brief デストラクタ
+     *
+     * クラス変数からインスタンスを削除する
+     */
     ~PanelWindow(void) {
         PanelWindow* p = this;
         free();
@@ -236,7 +274,7 @@ public:
      * 指定されたウィンドウの表示に必要な大きさを計算して、
      * ウィンドウの大きさを調整する。
      */
-    void AdjustWindow(void) {
+    void AdjustWindow(UINT uFlags = 0) {
         const int len = body().length();
 
         PanelWindow::setadd(
@@ -256,7 +294,7 @@ public:
                      rect().top,
                      rect().right - rect().left,
                      rect().bottom - rect().top,
-                     ((len == 0) ? SWP_HIDEWINDOW : SWP_SHOWWINDOW));
+                     ((len == 0) ? SWP_HIDEWINDOW : SWP_SHOWWINDOW) | uFlags);
         redraw();
     };
 
@@ -303,20 +341,5 @@ public:
 
     void SetClipBoardText(void);
 };
-
-BOOL InitHeader(HINSTANCE hInstance, const char *szIniFile);
-BOOL DestroyHeader(void);
-int ShowHeader(LPCTSTR lpMailID);
-void ShowWindow(void);
-void HideWindow(void);
-BOOL InitHeaederInstance(HINSTANCE hInstance, HWND hParentWnd);
-BOOL LoadFont(LOGFONT *lf, const char *szIni);
-BOOL SaveFont(LOGFONT *lf, const char *szIni);
-void SaveWindowPos(const char *szIni);
-UINT LoadAdjust(const char *szIni);
-void SaveAdjust(UINT pAdjust, const char *szIni);
-
-RECT& addrect(RECT& dst, const RECT& src);
-vec<char>& getLine(vec<char>& buf, char **pt);
 
 #endif /* PANELWIN_H */

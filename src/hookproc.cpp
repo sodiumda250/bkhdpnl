@@ -1,13 +1,13 @@
 /*
- * $Id: hookproc.cpp,v 1.1 2005/05/10 07:34:16 woods Exp $
+ * $Id: hookproc.cpp,v 1.2 2005/05/12 02:51:27 woods Exp $
  */
 
-static char id[] = "$Id: hookproc.cpp,v 1.1 2005/05/10 07:34:16 woods Exp $";
+static char id[] = "$Id: hookproc.cpp,v 1.2 2005/05/12 02:51:27 woods Exp $";
 
 #include <stdio.h>
 #include <windows.h>
 #include "hookproc.h"
-#include "panelwin.h"
+#include "panel.h"
 
 extern "C" {
 static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

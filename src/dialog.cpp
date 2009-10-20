@@ -1,15 +1,15 @@
 /*
- * $Id: dialog.cpp,v 1.1 2005/05/10 02:32:50 woods Exp $
+ * $Id: dialog.cpp,v 1.2 2005/05/12 02:51:27 woods Exp $
  * dialog.cpp : ダイアログ用のプロシージャ定義
  */
 
-static char id[] = "$Id: dialog.cpp,v 1.1 2005/05/10 02:32:50 woods Exp $";
+static char id[] = "$Id: dialog.cpp,v 1.2 2005/05/12 02:51:27 woods Exp $";
 
 #include <stdio.h>
 #include "resource.h"
 #include "dialog.h"
 #include "bkhdpnl.h"
-#include "panelwin.h"
+#include "panel.h"
 
 // グローバル変数:
 

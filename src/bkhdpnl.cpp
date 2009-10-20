@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////////
-// $Id: bkhdpnl.cpp,v 1.6 2005/05/10 07:34:16 woods Exp $
+// $Id: bkhdpnl.cpp,v 1.9 2005/05/12 02:51:27 woods Exp $
 //
 // Template file for plugin.
 //
@@ -9,7 +9,7 @@
 // Create a sub folder under "PlugInSDK" folder. e.g. "PlugInSDK\MyProject\" and
 // place your project files there.
 
-static char id[] = "$Id: bkhdpnl.cpp,v 1.6 2005/05/10 07:34:16 woods Exp $";
+static char id[] = "$Id: bkhdpnl.cpp,v 1.9 2005/05/12 02:51:27 woods Exp $";
 
 #include <windows.h>
 #include "PluginSDK/BeckyAPI.h"
@@ -17,17 +17,17 @@ static char id[] = "$Id: bkhdpnl.cpp,v 1.6 2005/05/10 07:34:16 woods Exp $";
 
 #include "resource.h"
 #include "bkhdpnl.h"
-#include "panelwin.h"
+#include "panel.h"
 #include "dialog.h"
 #include "hookproc.h"
 
 #define DLLEXPORT __declspec(dllexport)
 
-/// ベンダ名
+/// @brief ベンダ名
 static char Vendor[] = "woods";
-/// バージョン情報
+/// @brief バージョン情報
 static char Version[] = RELEASE_VERSION;
-/// プラグインの説明
+/// @brief プラグインの説明
 static char Description[] = "Show header list with other windows";
 
 CBeckyAPI bka; // You can have only one instance in a project.
@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// DLL entry point
+/// @brief DLL entry point
 BOOL APIENTRY DllMain( HANDLE hModule, 
 					   DWORD  ul_reason_for_call, 
 					   LPVOID lpReserved
@@ -79,7 +79,8 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 // Callbacks from Becky!
 
 ////////////////////////////////////////////////////////////////////////
-// Called when the program is started and the main window is created.
+/// @brief Called when the program is started and the main window is created.
+/// @return Always return 0.
 DLLEXPORT int WINAPI BKC_OnStart()
 {
 	/*
@@ -109,20 +110,21 @@ DLLEXPORT int WINAPI BKC_OnStart()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Called when the main window is closing.
+/// @brief Called when the main window is closing.
+/// @retval -1 if you don't want to quit.
+/// @retval 0 if you want to quit.
 DLLEXPORT int WINAPI BKC_OnExit()
 {
 	// Return -1 if you don't want to quit.
 
     SaveWindowPos(szIni);
 
-    unhookMailWindow();
-
 	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Called when menu is intialized.
+/// @brief Called when menu is intialized.
+/// @return Always return 0.
 DLLEXPORT int WINAPI BKC_OnMenuInit(HWND hWnd, HMENU hMenu, int nType)
 {
 	switch (nType) {
@@ -164,7 +166,8 @@ DLLEXPORT int WINAPI BKC_OnMenuInit(HWND hWnd, HMENU hMenu, int nType)
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Called when a folder is opened.
+/// @brief Called when a folder is opened.
+/// @return Always return 0.
 DLLEXPORT int WINAPI BKC_OnOpenFolder(LPCTSTR lpFolderID)
 {
 	// Always return 0.
@@ -178,7 +181,8 @@ DLLEXPORT int WINAPI BKC_OnOpenFolder(LPCTSTR lpFolderID)
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Called when a mail is selected.
+/// @brief Called when a mail is selected.
+/// @return Always return 0.
 DLLEXPORT int WINAPI BKC_OnOpenMail(LPCTSTR lpMailID)
 {
 	// Always return 0.
@@ -192,7 +196,8 @@ DLLEXPORT int WINAPI BKC_OnOpenMail(LPCTSTR lpMailID)
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Called every minute.
+/// @brief Called every minute.
+/// @return Always return 0.
 DLLEXPORT int WINAPI BKC_OnEveryMinute()
 {
 	// Always return 0.
@@ -200,7 +205,8 @@ DLLEXPORT int WINAPI BKC_OnEveryMinute()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Called when a compose windows is opened.
+/// @brief Called when a compose windows is opened.
+/// @return Always return 0.
 DLLEXPORT int WINAPI BKC_OnOpenCompose(HWND hWnd, int nMode/* See COMPOSE_MODE_* in BeckyApi.h */)
 {
 	// Always return 0.
@@ -208,7 +214,8 @@ DLLEXPORT int WINAPI BKC_OnOpenCompose(HWND hWnd, int nMode/* See COMPOSE_MODE_*
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Called when the composing message is saved.
+/// @brief Called when the composing message is saved.
+/// @retval -1 if you do not want to send it yet.
 DLLEXPORT int WINAPI BKC_OnOutgoing(HWND hWnd, int nMode/* 0:SaveToOutbox, 1:SaveToDraft, 2:SaveToReminder*/) 
 {
 	// Return -1 if you do not want to send it yet.
@@ -216,7 +223,8 @@ DLLEXPORT int WINAPI BKC_OnOutgoing(HWND hWnd, int nMode/* 0:SaveToOutbox, 1:Sav
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Called when a key is pressed.
+/// @brief Called when a key is pressed.
+/// @retval TRUE if you want to suppress subsequent command associated to this key.
 DLLEXPORT int WINAPI BKC_OnKeyDispatch(HWND hWnd, int nKey/* virtual key code */, int nShift/* Shift state. 0x40=Shift, 0x20=Ctrl, 0x60=Shift+Ctrl, 0xfe=Alt*/)
 {
 	// Return TRUE if you want to suppress subsequent command associated to this key.
@@ -224,7 +232,8 @@ DLLEXPORT int WINAPI BKC_OnKeyDispatch(HWND hWnd, int nKey/* virtual key code */
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Called when a message is retrieved and saved to a folder
+/// @brief Called when a message is retrieved and saved to a folder
+/// @return Always return 0.
 DLLEXPORT int WINAPI BKC_OnRetrieve(LPCTSTR lpMessage/* Message source*/, LPCTSTR lpMailID/* Mail ID*/)
 {
 	// Always return 0.
@@ -232,7 +241,16 @@ DLLEXPORT int WINAPI BKC_OnRetrieve(LPCTSTR lpMessage/* Message source*/, LPCTST
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Called when a message is spooled
+/// @brief Called when a message is spooled
+/// @retval BKC_ONSEND_PROCESSED, if you have processed this message
+/// and don't need Becky! to send it.
+/// Becky! will move this message to Sent box when the sending
+/// operation is done.
+/// CAUTION: You are responsible for the destination of this
+/// message if you return BKC_ONSEND_PROCESSED.
+/// @retval BKC_ONSEND_ERROR, if you want to cancel the sending operation.
+/// You are responsible for displaying an error message.
+/// @retval 0 to proceed the sending operation.
 DLLEXPORT int WINAPI BKC_OnSend(LPCTSTR lpMessage/* Message source */)
 {
 	// Return BKC_ONSEND_PROCESSED, if you have processed this message
@@ -250,7 +268,8 @@ DLLEXPORT int WINAPI BKC_OnSend(LPCTSTR lpMessage/* Message source */)
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Called when all messages are retrieved
+/// @brief Called when all messages are retrieved
+/// @return Always return 0.
 DLLEXPORT int WINAPI BKC_OnFinishRetrieve(int nNumber/* Number of messages*/)
 {
 	// Always return 0.
@@ -259,7 +278,8 @@ DLLEXPORT int WINAPI BKC_OnFinishRetrieve(int nNumber/* Number of messages*/)
 
 
 ////////////////////////////////////////////////////////////////////////
-// Called when plug-in setup is needed.
+/// @brief Called when plug-in setup is needed.
+/// @return Return nonzero if you have processed.
 DLLEXPORT int WINAPI BKC_OnPlugInSetup(HWND hWnd)
 {
 	// Return nonzero if you have processed.
@@ -288,7 +308,6 @@ DLLEXPORT int WINAPI BKC_OnPlugInSetup(HWND hWnd)
 
 
 ////////////////////////////////////////////////////////////////////////
-// Called when plug-in information is being retrieved.
 typedef struct tagBKPLUGININFO
 {
 	char szPlugInName[80]; // Name of the plug-in
@@ -297,6 +316,8 @@ typedef struct tagBKPLUGININFO
 	char szDescription[256]; // Short description about this plugin
 } BKPLUGININFO, *LPBKPLUGININFO;
 
+/// @brief Called when plug-in information is being retrieved.
+/// @return Always return 0.
 DLLEXPORT int WINAPI BKC_OnPlugInInfo(LPBKPLUGININFO lpPlugInInfo)
 {
 	/* You MUST specify at least szPlugInName and szVendor.
@@ -324,7 +345,20 @@ DLLEXPORT int WINAPI BKC_OnPlugInInfo(LPBKPLUGININFO lpPlugInInfo)
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Called when drag and drop operation occurs.
+/// @brief Called when drag and drop operation occurs.
+///	@param lpTgt:	A folder ID of the target folder.
+///			You can assume it is a root mailbox, if the string
+///			contains only one '\' character.
+///	@param lpSrc:	Either a folder ID or mail IDs. Multiple mail IDs are
+///			separated by '\n' (0x0a).
+///			You can assume it is a folder ID, if the string
+///			doesn't contain '?' character.
+///	@param nCount:	Number of items to be dropped.
+///			It can be more than one, if you drop mail items.
+///	@param dropEffect: Type of drag and drop operation
+///			<ul><li>1: Copy</li>
+///			    <li>2: Move</li>
+///			    <li>4: Link (Used for filtering setup in Becky!)</li></ul>
 DLLEXPORT int WINAPI BKC_OnDragDrop(LPCSTR lpTgt, LPCSTR lpSrc, int nCount, int dropEffect)
 {
 	/*
@@ -351,7 +385,11 @@ DLLEXPORT int WINAPI BKC_OnDragDrop(LPCSTR lpTgt, LPCSTR lpSrc, int nCount, int 
 
 
 ////////////////////////////////////////////////////////////////////////
-// Called when a message was retrieved and about to be filtered.
+/// @brief Called when a message was retrieved and about to be filtered.
+/// @retval BKC_FILTER_DEFAULT	Do nothing and apply default filtering rules.
+/// @retval BKC_FILTER_PASS		Apply default filtering rules after applying the rule it returns.
+/// @retval BKC_FILTER_DONE		Do not apply default rules.
+/// @retval BKC_FILTER_NEXT		Request Becky! to call this callback again so that another rules can be added.
 DLLEXPORT int WINAPI BKC_OnBeforeFilter(LPCSTR lpMessage, int* lpnAction, char** lppParam)
 {
 	/*

@@ -1,9 +1,9 @@
 #!/usr/bin/make -f
-# $Id: Makefile,v 1.8 2005/05/10 07:34:16 woods Exp $
+# $Id: Makefile,v 1.12 2005/05/12 06:53:04 woods Exp $
 
 MAJOR = 0
 MINOR = 0
-TEENY = 0
+TEENY = 1
 
 COPYRIGHT = '"Copyright (C) 2000-2005 woods"'
 
@@ -11,7 +11,9 @@ RELEASE_VERSION = $(MAJOR).$(MINOR).$(TEENY)
 
 TARGET = bkhdpnl.dll
 OBJS = bkhdpnl.$(OBJ) PluginSDK/BeckyAPI.$(OBJ) \
-	panelwin.$(OBJ) rectstr.$(OBJ) vec.$(OBJ) dialog.$(OBJ) hookproc.$(OBJ)
+	panelwin.$(OBJ) panel.$(OBJ) \
+	rectstr.$(OBJ) vec.$(OBJ) \
+	dialog.$(OBJ) hookproc.$(OBJ)
 RESOBJS = bkhdpnl_res.$(OBJ)
 LIBS = 
 SRCS = $(OBJS:.$(OBJ)=.cpp)
@@ -33,6 +35,7 @@ ZIP = zip
 LHA = lha
 TOUCH = touch
 FIND = find
+INSTALL = install
 
 # Compile and Link option
 CFLAGS = -g -O -Wall -pipe -mno-cygwin -I/usr/inlcude/w32api \
@@ -53,8 +56,8 @@ RELEASE_DIR = bkhdpnl$(RELEASE_VERSION)
 all: $(TARGET)
 
 install: all
-	mkdir -p $(INSTALLPATH)
-	install -p $(TARGET) $(INSTALLPATH)/$(INSTALLNAME)
+	$(MKDIR) $(INSTALLPATH)
+	$(INSTALL) -s -p $(TARGET) $(INSTALLPATH)/$(INSTALLNAME)
 
 deinstall:
 	$(RM) -f $(INSTALLPATH)/$(INSTALLNAME)
@@ -88,10 +91,10 @@ cleanall: clean
 	$(RM) -r $(DOCDIR)
 
 release: $(TARGET)
-	mkdir -p $(RELEASE_DIR)
-	mkdir -p $(RELEASE_DIR)/src
-	mkdir -p $(RELEASE_DIR)/src/PlugInSDK
-	install -p -s $(TARGET) $(RELEASE_DIR)
+	$(MKDIR) $(RELEASE_DIR)
+	$(MKDIR) $(RELEASE_DIR)/src
+	$(MKDIR) $(RELEASE_DIR)/src/PlugInSDK
+	$(INSTALL) -p -s $(TARGET) $(RELEASE_DIR)
 	$(CP) bkhdpnl.txt $(RELEASE_DIR)
 	$(CP) *.c* *.h *.def *.rc Makefile bkhdpnl.doxygen $(RELEASE_DIR)/src
 	$(CP) PlugInSDK/*.* $(RELEASE_DIR)/src/PlugInSDK
